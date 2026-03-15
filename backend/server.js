@@ -44,7 +44,8 @@ function createRequestSupabaseClient(authHeader) {
 // --- Middleware ---
 app.use(helmet())
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  origin: ["http://localhost:3000",
+    "https://studyflowtrackker.netlify.app"],
   credentials: true,
 }))
 app.use(express.json())
@@ -243,6 +244,30 @@ app.delete('/api/skills/:id', requireSupabaseClient, requireAuth, async (req, re
 
   if (error) return res.status(500).json({ error: error.message })
   res.status(204).send()
+})
+
+// --- Delete Account ---
+app.delete('/api/delete-account', requireSupabaseClient, requireAuth, async (req, res) => {
+  try {
+    if (!SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(500).json({
+        error: "Account deletion requires SUPABASE_SERVICE_ROLE_KEY"
+      })
+    }
+
+    const userId = req.user.id
+
+    const { error } = await supabaseServer.auth.admin.deleteUser(userId)
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    res.json({ success: true })
+
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete account" })
+  }
 })
 
 // --- Start ---
