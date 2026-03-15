@@ -540,15 +540,42 @@ function DataTab({ preferences, onUpdate }) {
           <div className="flex gap-3 pt-2">
             <Button variant="secondary" className="flex-1" onClick={() => setDeleteOpen(false)}>Cancel</Button>
             <Button
-              variant="danger"
-              className="flex-1"
-              onClick={() => {
-                alert('Account deletion requires server-side implementation with Supabase Admin API.')
-                setDeleteOpen(false)
-              }}
-            >
-              Yes, delete my account
-            </Button>
+  variant="danger"
+  className="flex-1"
+  onClick={async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/delete-account`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        }
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete account")
+      }
+
+      alert("Account deleted successfully")
+
+      await supabase.auth.signOut()
+
+      window.location.href = "/"
+
+    } catch (err) {
+      console.error(err)
+      alert("Failed to delete account")
+    }
+
+    setDeleteOpen(false)
+  }}
+>
+  Yes, delete my account
+</Button>
           </div>
         </div>
       </Modal>
