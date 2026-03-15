@@ -560,11 +560,13 @@ function DataTab({ preferences, onUpdate }) {
         throw new Error(data.error || "Failed to delete account")
       }
 
-      alert("Account deleted successfully")
-
       await supabase.auth.signOut()
 
-      window.location.href = "/"
+// store message temporarily
+sessionStorage.setItem("accountDeleted", "true")
+
+// redirect to landing page
+window.location.href = "/"
 
     } catch (err) {
       console.error(err)
