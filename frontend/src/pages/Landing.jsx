@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { useEffect, useState } from "react"
 import {
   Area,
   AreaChart,
@@ -76,6 +77,8 @@ const NAV_LINKS = [
   { label: 'How it works', href: '#process' },
   { label: 'Get started', href: '#cta' },
 ]
+
+
 
 function LandingChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
@@ -283,6 +286,18 @@ export default function Landing() {
   const howRef = useRef(null)
   const statsRef = useRef(null)
   const ctaRef = useRef(null)
+  const [showDeletePopup, setShowDeletePopup] = useState(false)
+
+  useEffect(() => {
+  if (sessionStorage.getItem("accountDeleted")) {
+    setShowDeletePopup(true)
+    sessionStorage.removeItem("accountDeleted")
+
+    setTimeout(() => {
+      setShowDeletePopup(false)
+    }, 4000)
+  }
+}, [])
 
   useGSAP(() => {
     gsap.to('.ambient-blob', {
@@ -552,6 +567,14 @@ export default function Landing() {
 
   return (
     <div ref={pageRef} className="relative isolate min-h-screen bg-[#020617] text-white overflow-x-hidden">
+      {showDeletePopup && (
+  <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
+    <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 text-sm text-emerald-300 shadow-lg backdrop-blur">
+      <Check size={16} />
+      Account deleted successfully
+    </div>
+  </div>
+)}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="ambient-blob absolute -top-40 -left-28 w-[34rem] h-[34rem] rounded-full bg-indigo-500/16 blur-[120px]" />
         <div className="ambient-blob absolute top-[18%] -right-20 w-[28rem] h-[28rem] rounded-full bg-purple-500/14 blur-[110px]" />
