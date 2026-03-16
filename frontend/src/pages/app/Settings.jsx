@@ -413,6 +413,7 @@ function DataTab({ preferences, onUpdate }) {
   const { notes } = useNotes()
   const { resources } = useResources()
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const exportCSV = () => {
     const header = ['Date', 'Topic', 'Subject', 'Duration (min)', 'Difficulty', 'Notes']
@@ -542,8 +543,11 @@ function DataTab({ preferences, onUpdate }) {
             <Button
   variant="danger"
   className="flex-1"
+  disabled={deleting}
   onClick={async () => {
     try {
+      setDeleting(true)
+
       const { data: { session } } = await supabase.auth.getSession()
 
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/delete-account`, {
@@ -562,21 +566,18 @@ function DataTab({ preferences, onUpdate }) {
 
       await supabase.auth.signOut()
 
-// store message temporarily
-sessionStorage.setItem("accountDeleted", "true")
+      sessionStorage.setItem("accountDeleted", "true")
 
-// redirect to landing page
-window.location.href = "/"
+      window.location.href = "/"
 
     } catch (err) {
       console.error(err)
       alert("Failed to delete account")
+      setDeleting(false)
     }
-
-    setDeleteOpen(false)
   }}
 >
-  Yes, delete my account
+  {deleting ? "Deleting account..." : "Yes, delete my account"}
 </Button>
           </div>
         </div>
