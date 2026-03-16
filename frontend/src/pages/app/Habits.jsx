@@ -342,6 +342,56 @@ export default function Habits() {
     };
   }, [habits]);
 
+  const todaysRoutines = useMemo(() => {
+  const todayKey = isoDate(today);
+
+  return habits
+    .map((habit) => {
+      const todayDay = days.find((d) => d.isToday);
+      if (!todayDay) return null;
+
+      const cell = getCellState(habit, todayDay, mergedLogs, today);
+
+      if (!cell.interactive) return null;
+
+      const status =
+        mergedLogs.get(`${habit.id}:${todayKey}`)?.status ?? "pending";
+
+      if (status === "completed") return null;
+
+      return {
+        ...habit,
+        status,
+      };
+    })
+    .filter(Boolean);
+}, [habits, days, mergedLogs, today]);
+
+  const todayProgress = useMemo(() => {
+  const todayKey = isoDate(today);
+
+  let eligible = 0;
+  let completed = 0;
+
+  habits.forEach((habit) => {
+    const todayDay = days.find((d) => d.isToday);
+    if (!todayDay) return;
+
+    const cell = getCellState(habit, todayDay, mergedLogs, today);
+
+    if (!cell.interactive) return;
+
+    eligible++;
+
+    const status =
+      mergedLogs.get(`${habit.id}:${todayKey}`)?.status ?? "pending";
+
+    if (status === "completed") completed++;
+  });
+
+  return { completed, eligible };
+}, [habits, days, mergedLogs, today]);
+
   useEffect(() => {
     if (!animatedCell) return undefined;
     const timeout = window.setTimeout(() => setAnimatedCell(""), 200);
@@ -580,6 +630,54 @@ export default function Habits() {
           color="amber"
         />
       </div>
+
+      {/* Today's Routines */}
+<Card className="border-slate-800/40 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))]">
+  <CardHeader>
+    <CardTitle className="flex items-center justify-between text-slate-100">
+  <div className="flex items-center gap-2">
+    <CheckCircle2 size={18} />
+    Today's Routines
+  </div>
+
+  <span className="text-xs bg-slate-800 border border-slate-700 px-2 py-0.5 rounded-md text-slate-300">
+    {todayProgress.completed} / {todayProgress.eligible}
+  </span>
+</CardTitle>
+  </CardHeader>
+
+  <CardContent>
+    {todaysRoutines.length === 0 ? (
+      <p className="text-sm text-slate-500">
+        All routines completed for today 🎉
+      </p>
+    ) : (
+      <div className="space-y-2">
+        {todaysRoutines.map((habit) => {
+          const todayDay = days.find((d) => d.isToday);
+
+          return (
+            <div
+              key={habit.id}
+              className="flex items-center justify-between rounded-lg border border-slate-800/40 bg-slate-900/30 px-3 py-2"
+            >
+              <span className="text-sm text-slate-200">
+                {habit.title}
+              </span>
+
+              <button
+                onClick={() => handleToggleCell(habit, todayDay)}
+                className="flex items-center justify-center w-7 h-7 rounded-md border border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/20 transition"
+              >
+                <Check size={14} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </CardContent>
+</Card>
 
       {/* Habit Tracker Section */}
       <Card className="border-slate-800/40 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))]">
