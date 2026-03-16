@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
     return supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/app`,
       },
     })
   }
