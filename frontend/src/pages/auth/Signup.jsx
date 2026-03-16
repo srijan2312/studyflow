@@ -153,10 +153,16 @@ export default function Signup() {
     setError('')
     setLoading(true)
     try {
-      const { error: authError } = await signUp(form.email, form.password, form.name)
-      if (authError) throw authError
-      setSuccess(true)
-      setTimeout(() => navigate('/app'), 1500)
+      const { data, error: authError } = await signUp(form.email, form.password, form.name)
+
+if (authError) throw authError
+
+setSuccess(true)
+
+// only redirect if session exists
+if (data?.session) {
+  navigate("/app")
+}
     } catch (err) {
       setError(err.message ?? 'Something went wrong')
     } finally {
