@@ -18,6 +18,7 @@ import Settings from './pages/app/Settings'
 import TopicMastery from './pages/app/TopicMastery'
 import Achievements from './pages/app/Achievements'
 import Habits from './pages/app/Habits'
+import ResetPassword from './pages/auth/ResetPassword'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected app */}
       <Route
