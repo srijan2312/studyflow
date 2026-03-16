@@ -343,13 +343,13 @@ export default function Habits() {
   }, [habits]);
 
   const todaysRoutines = useMemo(() => {
-  const todayKey = isoDate(today);
+  const todayDay = days.find((d) => d.isToday);
+  if (!todayDay) return [];
+
+  const todayKey = isoDate(todayDay.date);
 
   return habits
     .map((habit) => {
-      const todayDay = days.find((d) => d.isToday);
-      if (!todayDay) return null;
-
       const cell = getCellState(habit, todayDay, mergedLogs, today);
 
       if (!cell.interactive) return null;
@@ -357,11 +357,9 @@ export default function Habits() {
       const status =
         mergedLogs.get(`${habit.id}:${todayKey}`)?.status ?? "pending";
 
-      if (status === "completed") return null;
-
       return {
         ...habit,
-        status,
+        completed: status === "completed",
       };
     })
     .filter(Boolean);
@@ -658,20 +656,27 @@ export default function Habits() {
 
           return (
             <div
-              key={habit.id}
-              className="flex items-center justify-between rounded-lg border border-slate-800/40 bg-slate-900/30 px-3 py-2"
-            >
-              <span className="text-sm text-slate-200">
-                {habit.title}
-              </span>
+  key={habit.id}
+  className={cn(
+    "flex items-center justify-between rounded-xl border border-slate-800/40 bg-slate-900/30 px-4 py-3 transition-all",
+    habit.completed && "opacity-60"
+  )}
+>
+  <span
+    className={cn(
+      "text-sm font-medium transition-all",
+      habit.completed
+        ? "line-through text-emerald-400"
+        : "text-slate-200"
+    )}
+  >
+    {habit.title}
+  </span>
 
-              <button
-                onClick={() => handleToggleCell(habit, todayDay)}
-                className="flex items-center justify-center w-7 h-7 rounded-md border border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/20 transition"
-              >
-                <Check size={14} />
-              </button>
-            </div>
+  {habit.completed && (
+    <Check size={16} className="text-emerald-400" />
+  )}
+</div>
           );
         })}
       </div>
