@@ -207,7 +207,7 @@ function getHabitStats(habit, days, logMap) {
   for (const day of days) {
     const cellDate = startOfDayCustom(day.date);
 
-    if (startDate && cellDate < startDate) {
+    if (habit.frequency !== "daily" && startDate && cellDate < startDate) {
   continue;
 }
 
@@ -940,15 +940,13 @@ day.date.getDay() !== habit.weekly_day &&
                                 className={cn(
                                   "flex items-center justify-center rounded-[5px] border transition-all duration-150 w-[22px] h-[22px]",
 
-                                  cell.beforeStart
-  ? "border border-slate-800 bg-slate-900/60 cursor-not-allowed"
-  : cell.future
-  ? "border border-slate-800 bg-slate-900/40 cursor-not-allowed"
-  : cell.completed
-  ? "border-[rgba(16,185,129,0.6)] bg-[rgba(16,185,129,0.25)] text-emerald-400"
-  : cell.past
-  ? "border-[rgba(255,255,255,0.18)] bg-[rgba(255,255,255,0.03)]"
-  : "border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(120,160,255,0.7)] hover:bg-[rgba(120,160,255,0.15)] hover:scale-110 cursor-pointer"
+                                  !cell.interactive
+                                    ? "border border-slate-700/40 bg-slate-900/30 bg-slate-900/50 cursor-not-allowed"
+                                    : cell.completed
+                                      ? "border-[rgba(16,185,129,0.6)] bg-[rgba(16,185,129,0.25)] text-emerald-400"
+                                      : cell.past
+                                        ? "border-[rgba(255,255,255,0.18)] bg-[rgba(255,255,255,0.03)]"
+                                        : "border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(120,160,255,0.7)] hover:bg-[rgba(120,160,255,0.15)] hover:scale-110 cursor-pointer",
                                 )}
                                 aria-label={`${habit.title} - ${day.key} - ${cell.status}`}
                               >
@@ -956,12 +954,8 @@ day.date.getDay() !== habit.weekly_day &&
   <Check size={12} className="text-emerald-400" />
 )}
 
-{cell.beforeStart && (
+{!cell.interactive && (habit.frequency === "weekly" || habit.frequency === "custom") && (
   <span className="text-[10px] text-slate-600">×</span>
-)}
-
-{cell.future && (
-  <Lock size={10} className="text-slate-600" />
 )}
                               </button>
                             </div>
