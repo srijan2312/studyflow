@@ -207,7 +207,7 @@ function getHabitStats(habit, days, logMap) {
   for (const day of days) {
     const cellDate = startOfDayCustom(day.date);
 
-    if (habit.frequency !== "daily" && startDate && cellDate < startDate) {
+    if (startDate && cellDate < startDate) {
   continue;
 }
 
